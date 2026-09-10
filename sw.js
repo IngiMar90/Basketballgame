@@ -1,6 +1,6 @@
-const CACHE = "korfubolti-v4";
+const CACHE = "korfubolti-v5";
 const FILES = [
-  "./", "./index.html", "./styles.css", "./game.js?v=3", "./manifest.webmanifest",
+  "./", "./index.html", "./styles.css", "./game.js?v=4", "./manifest.webmanifest",
   "./assets/gym.webp", "./assets/hoop-game-v2.webp", "./assets/ball-game.webp",
   ...Array.from({length: 8}, (_, i) => `./assets/player/frame-0${i}.webp`),
   "./assets/ui/icon-192.png", "./assets/ui/icon-512.png"

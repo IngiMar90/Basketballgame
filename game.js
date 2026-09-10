@@ -18,8 +18,11 @@ const ball = { x: 0, y: 0, vx: 0, vy: 0, radius: 23, active: false, scored: fals
 const state = {
   started: false, ended: false, mode: "challenge", score: 0, shots: 10, streak: 0,
   charging: false, power: 0, chargeDirection: 1, canShoot: true, sound: true,
-  keys: { left: false, right: false }, lastTime: performance.now(), messageTimer: 0
+  keys: { left: false, right: false }, lastTime: performance.now(), messageTimer: 0,
+  targetX: null, previousTargetX: null
 };
+
+const targetPositions = [135, 255, 385, 520, 650, 770];
 
 const images = {};
 const sources = {
@@ -35,12 +38,25 @@ function loadImages() {
 }
 
 function startGame(mode = state.mode) {
-  state.mode = mode; state.started = true; state.ended = false; state.score = 0; state.shots = mode === "challenge" ? 10 : Infinity;
+  state.mode = mode; state.started = true; state.ended = false; state.score = 0; state.shots = mode === "practice" ? Infinity : 10;
   state.streak = 0; state.charging = false; state.power = 0; state.canShoot = true;
-  player.x = 265; player.frame = 0; ball.active = false;
+  player.x = 265; player.frame = 0; ball.active = false; state.targetX = null; state.previousTargetX = null;
+  if (mode === "target") chooseNextTarget(true);
   ui.start.classList.add("hidden"); ui.end.classList.add("hidden");
   ui.shotsBox.classList.toggle("hidden", mode === "practice");
-  updateHud(); showMessage(mode === "challenge" ? "10 boltar – gangi þér vel!" : "Frjáls æfing", false, 1300);
+  updateHud();
+  if (mode === "target") showMessage("Stattu í rauða hringnum!", false, 1500);
+  else showMessage(mode === "challenge" ? "10 boltar – gangi þér vel!" : "Frjáls æfing", false, 1300);
+}
+
+function chooseNextTarget(first = false) {
+  const choices = targetPositions.filter(x => x !== state.targetX && (first ? Math.abs(x - player.x) > 80 : Math.abs(x - state.targetX) >= 120));
+  state.previousTargetX = state.targetX;
+  state.targetX = choices[Math.floor(Math.random() * choices.length)];
+}
+
+function playerIsOnTarget() {
+  return state.mode !== "target" || Math.abs(player.x - state.targetX) <= 42;
 }
 
 function updateHud() {
@@ -60,6 +76,10 @@ function endGame() {
 
 function beginCharge() {
   if (!state.started || state.ended || !state.canShoot || ball.active) return;
+  if (!playerIsOnTarget()) {
+    showMessage("Stattu í rauða hringnum!", false, 900);
+    return;
+  }
   state.charging = true; state.power = Math.max(5, state.power); state.chargeDirection = 1;
   player.frame = 4; ui.shoot.classList.add("pressed");
 }
@@ -89,11 +109,15 @@ function shootBall(power) {
 
 function resetForNextShot() {
   ball.active = false; player.frame = 0;
-  if (state.mode === "challenge" && state.shots <= 0) {
+  if (state.mode !== "practice" && state.shots <= 0) {
     state.canShoot = false;
     setTimeout(endGame, 550);
   } else {
     state.canShoot = true;
+    if (state.mode === "target") {
+      chooseNextTarget();
+      showMessage("Nýr skotstaður!", false, 850);
+    }
   }
 }
 
@@ -186,6 +210,18 @@ function draw() {
   ctx.clearRect(0, 0, W, H);
   if (images.gym) ctx.drawImage(images.gym, 0, 0, W, H);
   else { ctx.fillStyle = "#c9e6f5"; ctx.fillRect(0, 0, W, H); }
+
+  if (state.started && state.mode === "target" && state.targetX !== null) {
+    const onTarget = playerIsOnTarget();
+    ctx.save();
+    ctx.fillStyle = onTarget ? "rgba(40, 190, 85, .24)" : "rgba(225, 35, 45, .24)";
+    ctx.strokeStyle = onTarget ? "#19a64a" : "#e51f2b";
+    ctx.lineWidth = 9;
+    ctx.beginPath(); ctx.ellipse(state.targetX, floorY - 2, 62, 20, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = "white"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(state.targetX, floorY - 2, 48, 12, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
 
   ctx.fillStyle = "rgba(9,38,78,.12)"; ctx.beginPath(); ctx.ellipse(player.x, floorY + 2, 72, 13, 0, 0, Math.PI * 2); ctx.fill();
   const p = images[`p${player.frame}`] || images.p0;

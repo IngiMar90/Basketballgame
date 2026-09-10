@@ -266,7 +266,13 @@ function setMove(direction, pressed) {
   state.keys[direction] = pressed; ui[direction].classList.toggle("pressed", pressed);
 }
 
-function setAim(direction, pressed, nudge = false) {
+function adjustAngle(delta) {
+  if (!state.started || ball.active || state.charging) return;
+  state.angle = Math.max(35, Math.min(75, state.angle + delta));
+  ui.angleValue.textContent = `${Math.round(state.angle)}°`;
+}
+
+function setAim(direction, pressed) {
   if (!pressed) {
     state.keys[direction] = false;
     ui[direction === "up" ? "aimUp" : "aimDown"].classList.remove("pressed");
@@ -275,7 +281,6 @@ function setAim(direction, pressed, nudge = false) {
   if (!state.started || ball.active || state.charging) return;
   state.keys[direction] = pressed;
   ui[direction === "up" ? "aimUp" : "aimDown"].classList.toggle("pressed", pressed);
-  if (pressed && nudge) state.angle = Math.max(35, Math.min(75, state.angle + (direction === "up" ? 2 : -2)));
 }
 
 function holdButton(button, onDown, onUp) {
@@ -286,24 +291,26 @@ function holdButton(button, onDown, onUp) {
 
 holdButton(ui.left, () => setMove("left", true), () => setMove("left", false));
 holdButton(ui.right, () => setMove("right", true), () => setMove("right", false));
-holdButton(ui.aimUp, () => setAim("up", true, true), () => setAim("up", false));
-holdButton(ui.aimDown, () => setAim("down", true, true), () => setAim("down", false));
 holdButton(ui.shoot, beginCharge, releaseShot);
+ui.aimUp.addEventListener("click", () => adjustAngle(2));
+ui.aimDown.addEventListener("click", () => adjustAngle(-2));
 
 window.addEventListener("keydown", e => {
-  if (["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Space","Enter","KeyA","KeyD","KeyW","KeyS"].includes(e.code)) e.preventDefault();
+  const key = e.key.toLowerCase();
+  if (["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Space","Enter","KeyA","KeyD","KeyW","KeyS"].includes(e.code) || ["a","d","w","s"].includes(key)) e.preventDefault();
   if (e.repeat && ["Space","Enter"].includes(e.code)) return;
-  if (e.code === "ArrowLeft" || e.code === "KeyA") setMove("left", true);
-  if (e.code === "ArrowRight" || e.code === "KeyD") setMove("right", true);
-  if ((e.code === "ArrowUp" || e.code === "KeyW") && !state.keys.up) setAim("up", true, true);
-  if ((e.code === "ArrowDown" || e.code === "KeyS") && !state.keys.down) setAim("down", true, true);
+  if (e.code === "ArrowLeft" || e.code === "KeyA" || key === "a") setMove("left", true);
+  if (e.code === "ArrowRight" || e.code === "KeyD" || key === "d") setMove("right", true);
+  if ((e.code === "ArrowUp" || e.code === "KeyW" || key === "w") && !state.keys.up) { adjustAngle(2); setAim("up", true); }
+  if ((e.code === "ArrowDown" || e.code === "KeyS" || key === "s") && !state.keys.down) { adjustAngle(-2); setAim("down", true); }
   if (e.code === "Space" || e.code === "Enter") beginCharge();
 });
 window.addEventListener("keyup", e => {
-  if (e.code === "ArrowLeft" || e.code === "KeyA") setMove("left", false);
-  if (e.code === "ArrowRight" || e.code === "KeyD") setMove("right", false);
-  if (e.code === "ArrowUp" || e.code === "KeyW") setAim("up", false);
-  if (e.code === "ArrowDown" || e.code === "KeyS") setAim("down", false);
+  const key = e.key.toLowerCase();
+  if (e.code === "ArrowLeft" || e.code === "KeyA" || key === "a") setMove("left", false);
+  if (e.code === "ArrowRight" || e.code === "KeyD" || key === "d") setMove("right", false);
+  if (e.code === "ArrowUp" || e.code === "KeyW" || key === "w") setAim("up", false);
+  if (e.code === "ArrowDown" || e.code === "KeyS" || key === "s") setAim("down", false);
   if (e.code === "Space" || e.code === "Enter") releaseShot();
 });
 

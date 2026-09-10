@@ -130,12 +130,13 @@ function sound(type) {
   const now = audio.currentTime;
   if (type === "score") {
     osc.frequency.setValueAtTime(520, now); osc.frequency.exponentialRampToValueAtTime(980, now + .18);
-    gain.gain.setValueAtTime(.12, now); gain.gain.exponentialRampToValueAtTime(.001, now + .35); osc.stop(now + .36);
+    gain.gain.setValueAtTime(.12, now); gain.gain.exponentialRampToValueAtTime(.001, now + .35);
+    osc.start(now); osc.stop(now + .36);
   } else {
     osc.frequency.setValueAtTime(180, now); osc.frequency.exponentialRampToValueAtTime(90, now + .12);
-    gain.gain.setValueAtTime(.06, now); gain.gain.exponentialRampToValueAtTime(.001, now + .15); osc.stop(now + .16);
+    gain.gain.setValueAtTime(.06, now); gain.gain.exponentialRampToValueAtTime(.001, now + .15);
+    osc.start(now); osc.stop(now + .16);
   }
-  osc.start(now);
 }
 
 function update(dt) {

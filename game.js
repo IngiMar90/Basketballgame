@@ -9,7 +9,7 @@ const ui = {
   left: document.querySelector("#leftBtn"), right: document.querySelector("#rightBtn"), shoot: document.querySelector("#shootBtn"),
   fill: document.querySelector("#powerFill"), marker: document.querySelector("#powerMarker"), powerNumber: document.querySelector("#powerNumber"),
   aimUp: document.querySelector("#aimUpBtn"), aimDown: document.querySelector("#aimDownBtn"), angleValue: document.querySelector("#angleValue"),
-  sound: document.querySelector("#soundBtn"), fullscreen: document.querySelector("#fullscreenBtn")
+  home: document.querySelector("#homeBtn"), sound: document.querySelector("#soundBtn"), fullscreen: document.querySelector("#fullscreenBtn")
 };
 
 const W = 1280, H = 720, floorY = 662;
@@ -322,7 +322,18 @@ canvas.addEventListener("pointerdown", e => {
 
 document.querySelectorAll("[data-mode]").forEach(btn => btn.addEventListener("click", () => startGame(btn.dataset.mode)));
 document.querySelector("#playAgainBtn").addEventListener("click", () => startGame(state.mode));
-document.querySelector("#menuBtn").addEventListener("click", () => { ui.end.classList.add("hidden"); ui.start.classList.remove("hidden"); state.ended = false; draw(); });
+function goHome() {
+  state.started = false; state.ended = false; state.charging = false; state.canShoot = true;
+  state.keys.left = false; state.keys.right = false; state.keys.up = false; state.keys.down = false;
+  player.vx = 0; ball.active = false; state.power = 0;
+  clearTimeout(state.messageTimer); ui.message.className = "game-message";
+  ui.fill.style.width = "0%"; ui.marker.style.left = "0%"; ui.powerNumber.textContent = "0%";
+  ui.left.classList.remove("pressed"); ui.right.classList.remove("pressed");
+  ui.aimUp.classList.remove("pressed"); ui.aimDown.classList.remove("pressed"); ui.shoot.classList.remove("pressed");
+  ui.end.classList.add("hidden"); ui.start.classList.remove("hidden"); draw();
+}
+document.querySelector("#menuBtn").addEventListener("click", goHome);
+ui.home.addEventListener("click", goHome);
 ui.sound.addEventListener("click", () => { state.sound = !state.sound; ui.sound.textContent = state.sound ? "🔊" : "🔇"; });
 ui.fullscreen.addEventListener("click", async () => {
   try { if (!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen(); } catch (_) { showMessage("Fullscreen er ekki í boði", false); }

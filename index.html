@@ -7,7 +7,7 @@
   <meta name="description" content="Einfaldur og aðgengilegur körfuboltaleikur.">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/ui/icon-192.png">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=2">
   <title>Körfuboltaáskorun</title>
 </head>
 <body>
@@ -20,6 +20,7 @@
         <span>Met <strong id="highScore">0</strong></span>
       </div>
       <div class="toolbar">
+        <button id="homeBtn" class="icon-btn" type="button" aria-label="Til baka á heimaskjá" title="Heimaskjár">🏠</button>
         <button id="soundBtn" class="icon-btn" type="button" aria-label="Slökkva eða kveikja á hljóði">🔊</button>
         <button id="fullscreenBtn" class="icon-btn" type="button" aria-label="Fylla skjá">⛶</button>
       </div>
@@ -74,6 +75,6 @@
     </section>
     <p class="help">Þú getur líka smellt á völlinn til að færa leikmanninn.</p>
   </main>
-  <script src="./game.js?v=6"></script>
+  <script src="./game.js?v=7"></script>
 </body>
 </html>

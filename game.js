@@ -12,7 +12,7 @@ const ui = {
 };
 
 const W = 1280, H = 720, floorY = 662;
-const hoop = { rimLeft: 1110, rimRight: 1218, rimY: 323 };
+const hoop = { rimLeft: 987, rimRight: 1093, rimY: 323 };
 const player = { x: 265, y: floorY, vx: 0, width: 148, height: 232, frame: 0, anim: 0 };
 const ball = { x: 0, y: 0, vx: 0, vy: 0, radius: 23, active: false, scored: false, bounced: false, age: 0 };
 const state = {
@@ -23,7 +23,7 @@ const state = {
 
 const images = {};
 const sources = {
-  gym: "./assets/gym.webp", hoop: "./assets/hoop-game.webp", ball: "./assets/ball-game.webp",
+  gym: "./assets/gym.webp", hoop: "./assets/hoop-game-v2.webp", ball: "./assets/ball-game.webp",
   ...Object.fromEntries(Array.from({ length: 8 }, (_, i) => [`p${i}`, `./assets/player/frame-0${i}.webp`]))
 };
 
@@ -161,8 +161,8 @@ function update(dt) {
     const crossedRim = oldY < hoop.rimY && ball.y >= hoop.rimY && ball.vy > 0;
     if (crossedRim && ball.x > hoop.rimLeft && ball.x < hoop.rimRight) scoreBasket();
 
-    if (!ball.scored && ball.x + ball.radius > 1192 && ball.x - ball.radius < 1210 && ball.y > 215 && ball.y < 388 && ball.vx > 0) {
-      ball.x = 1192 - ball.radius; ball.vx *= -.72; sound("bounce");
+    if (!ball.scored && ball.x + ball.radius > 1100 && ball.x - ball.radius < 1116 && ball.y > 215 && ball.y < 388 && ball.vx > 0) {
+      ball.x = 1100 - ball.radius; ball.vx *= -.72; sound("bounce");
     }
 
     for (const rx of [hoop.rimLeft, hoop.rimRight]) {

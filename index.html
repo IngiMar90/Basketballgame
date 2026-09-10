@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="is">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#0b3d91">
+  <meta name="description" content="Einfaldur og aðgengilegur körfuboltaleikur.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/ui/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Körfuboltaáskorun</title>
+</head>
+<body>
+  <main class="app" aria-label="Körfuboltaáskorun">
+    <header class="topbar">
+      <div class="brand"><span class="mini-ball">●</span> Körfuboltaáskorun</div>
+      <div class="stats" aria-live="polite">
+        <span>Stig <strong id="score">0</strong></span>
+        <span id="shotsBox">Boltar <strong id="shots">10</strong></span>
+        <span>Met <strong id="highScore">0</strong></span>
+      </div>
+      <div class="toolbar">
+        <button id="soundBtn" class="icon-btn" type="button" aria-label="Slökkva eða kveikja á hljóði">🔊</button>
+        <button id="fullscreenBtn" class="icon-btn" type="button" aria-label="Fylla skjá">⛶</button>
+      </div>
+    </header>
+
+    <section id="gameShell" class="game-shell">
+      <canvas id="gameCanvas" width="1280" height="720" aria-label="Körfuboltavöllur"></canvas>
+
+      <div id="message" class="game-message" aria-live="assertive"></div>
+
+      <div id="startPanel" class="panel start-panel">
+        <div class="panel-card">
+          <div class="title-ball">🏀</div>
+          <h1>Körfuboltaáskorun</h1>
+          <p>Færðu leikmanninn, haltu inni <strong>SKJÓTA</strong> og slepptu þegar mælirinn er á græna svæðinu.</p>
+          <div class="mode-buttons">
+            <button class="primary" data-mode="challenge" type="button">10 bolta áskorun</button>
+            <button class="secondary" data-mode="practice" type="button">Frjáls æfing</button>
+          </div>
+          <p class="keys">Lyklaborð: ← → eða A D · Halda inni bilslá/Enter til að skjóta</p>
+        </div>
+      </div>
+
+      <div id="endPanel" class="panel hidden">
+        <div class="panel-card">
+          <div id="endStars" class="end-stars">⭐</div>
+          <h2>Vel gert!</h2>
+          <p>Þú fékkst <strong id="finalScore">0 stig</strong>.</p>
+          <button id="playAgainBtn" class="primary" type="button">Spila aftur</button>
+          <button id="menuBtn" class="secondary" type="button">Aðalvalmynd</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Leikjastýring">
+      <button id="leftBtn" class="move-btn" type="button" aria-label="Færa til vinstri">◀</button>
+      <div class="power-wrap">
+        <div class="power-label"><span>Kraftur</span><strong id="powerNumber">0%</strong></div>
+        <div class="power-track" aria-hidden="true">
+          <div class="sweet-spot"></div>
+          <div id="powerFill" class="power-fill"></div>
+          <div id="powerMarker" class="power-marker"></div>
+        </div>
+      </div>
+      <button id="shootBtn" class="shoot-btn" type="button">SKJÓTA</button>
+      <button id="rightBtn" class="move-btn" type="button" aria-label="Færa til hægri">▶</button>
+    </section>
+    <p class="help">Þú getur líka smellt á völlinn til að færa leikmanninn.</p>
+  </main>
+  <script src="./game.js"></script>
+</body>
+</html>

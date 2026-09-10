@@ -5,6 +5,7 @@ Einfaldur umbunarleikur fyrir nemendur. Leikurinn virkar með lyklaborði, mús 
 ## Stjórnun
 
 - **← / →** eða **A / D**: færa leikmann.
+- **W / S** eða **↑ / ↓**: hækka eða lækka skotlínuna.
 - Smella á völlinn: færa leikmann á valinn stað.
 - Halda inni **bilslá**, **Enter** eða **SKJÓTA**: safna krafti.
 - Sleppa takkanum: skjóta.

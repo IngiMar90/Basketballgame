@@ -34,13 +34,13 @@
         <div class="panel-card">
           <div class="title-ball">🏀</div>
           <h1>Körfuboltaáskorun</h1>
-          <p>Færðu leikmanninn, haltu inni <strong>SKJÓTA</strong> og slepptu þegar mælirinn er á græna svæðinu.</p>
+          <p>Færðu leikmanninn, stilltu skotlínuna og veldu síðan hversu mikinn kraft þú notar.</p>
           <div class="mode-buttons">
             <button class="primary" data-mode="challenge" type="button">10 bolta áskorun</button>
             <button class="secondary" data-mode="target" type="button">Áskorun</button>
             <button class="secondary" data-mode="practice" type="button">Frjáls æfing</button>
           </div>
-          <p class="keys">Lyklaborð: ← → eða A D · Halda inni bilslá/Enter til að skjóta</p>
+          <p class="keys">Færsla: ← → eða A D · Skotlína: W S · Skot: bilslá/Enter</p>
         </div>
       </div>
 
@@ -57,10 +57,14 @@
 
     <section class="controls" aria-label="Leikjastýring">
       <button id="leftBtn" class="move-btn" type="button" aria-label="Færa til vinstri">◀</button>
+      <div class="aim-controls" aria-label="Stilla skotlínu">
+        <button id="aimUpBtn" class="aim-btn" type="button" aria-label="Hækka skotlínu">W ▲</button>
+        <strong id="angleValue">55°</strong>
+        <button id="aimDownBtn" class="aim-btn" type="button" aria-label="Lækka skotlínu">S ▼</button>
+      </div>
       <div class="power-wrap">
         <div class="power-label"><span>Kraftur</span><strong id="powerNumber">0%</strong></div>
         <div class="power-track" aria-hidden="true">
-          <div class="sweet-spot"></div>
           <div id="powerFill" class="power-fill"></div>
           <div id="powerMarker" class="power-marker"></div>
         </div>
@@ -70,6 +74,6 @@
     </section>
     <p class="help">Þú getur líka smellt á völlinn til að færa leikmanninn.</p>
   </main>
-  <script src="./game.js?v=4"></script>
+  <script src="./game.js?v=5"></script>
 </body>
 </html>

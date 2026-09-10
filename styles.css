@@ -121,7 +121,7 @@ canvas { display: block; width: 100%; height: 100%; cursor: pointer; touch-actio
 .controls {
   min-height: 92px;
   display: grid;
-  grid-template-columns: 72px minmax(140px, 1fr) minmax(110px, 190px) 72px;
+  grid-template-columns: 72px 88px minmax(140px, 1fr) minmax(110px, 190px) 72px;
   align-items: center;
   gap: clamp(8px, 2vw, 22px);
   padding: 10px clamp(10px, 3vw, 34px);
@@ -140,6 +140,32 @@ canvas { display: block; width: 100%; height: 100%; cursor: pointer; touch-actio
   font-weight: 1000;
   user-select: none;
 }
+
+.aim-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 30px 22px 30px;
+  align-items: center;
+  text-align: center;
+}
+
+.aim-controls strong { color: var(--blue); font-size: 16px; line-height: 1; }
+
+.aim-btn {
+  height: 29px;
+  padding: 0 5px;
+  border: 2px solid #082c6b;
+  border-radius: 9px;
+  color: white;
+  background: var(--blue-2);
+  box-shadow: 0 2px 0 #082c6b;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  user-select: none;
+}
+.aim-btn.pressed { transform: translateY(2px); box-shadow: none; }
+.aim-btn:focus-visible { outline: 3px solid var(--orange); outline-offset: 1px; }
 .move-btn { font-size: 30px; }
 .shoot-btn { color: #342200; background: var(--gold); font-size: clamp(17px, 2vw, 25px); }
 .move-btn.pressed, .shoot-btn.pressed { transform: translateY(4px); box-shadow: 0 1px 0 #082c6b; }
@@ -147,9 +173,8 @@ canvas { display: block; width: 100%; height: 100%; cursor: pointer; touch-actio
 
 .power-wrap { min-width: 0; }
 .power-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 800; }
-.power-track { position: relative; height: 30px; overflow: hidden; border: 3px solid #172b49; border-radius: 999px; background: linear-gradient(90deg,#a6def7,#ffd15c,#ef4d42); }
-.sweet-spot { position: absolute; z-index: 1; left: 64%; width: 14%; height: 100%; background: rgba(34,185,79,.95); box-shadow: inset 0 0 0 2px white; }
-.power-fill { position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(255,255,255,.42); }
+.power-track { position: relative; height: 30px; overflow: hidden; border: 3px solid #172b49; border-radius: 999px; background: linear-gradient(90deg,#25ad4a 0%,#e8cd2f 52%,#e53935 100%); }
+.power-fill { position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(255,255,255,.22); }
 .power-marker { position: absolute; z-index: 2; top: -4px; bottom: -4px; left: 0; width: 7px; border-radius: 5px; background: #111; transform: translateX(-50%); }
 .help { margin: 0; padding: 4px 12px 8px; text-align: center; color: #536781; background: #f7fbff; font-size: 13px; }
 .hidden { display: none !important; }
@@ -161,10 +186,13 @@ canvas { display: block; width: 100%; height: 100%; cursor: pointer; touch-actio
   .stats { justify-self: start; }
   .icon-btn { width: 38px; height: 38px; }
   .game-shell { max-height: none; }
-  .controls { grid-template-columns: 56px 1fr 92px 56px; gap: 7px; min-height: 78px; padding: 8px; }
+  .controls { grid-template-columns: 52px 58px minmax(76px, 1fr) 82px 52px; gap: 4px; min-height: 78px; padding: 7px 5px; }
   .move-btn, .shoot-btn { height: 56px; border-radius: 13px; }
   .shoot-btn { font-size: 15px; }
   .power-track { height: 25px; }
+  .aim-controls { grid-template-rows: 25px 18px 25px; }
+  .aim-btn { height: 24px; font-size: 11px; }
+  .aim-controls strong { font-size: 13px; }
   .help { display: none; }
 }
 

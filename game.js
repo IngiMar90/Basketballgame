@@ -8,6 +8,7 @@ const ui = {
   end: document.querySelector("#endPanel"), finalScore: document.querySelector("#finalScore"), endStars: document.querySelector("#endStars"),
   left: document.querySelector("#leftBtn"), right: document.querySelector("#rightBtn"), shoot: document.querySelector("#shootBtn"),
   fill: document.querySelector("#powerFill"), marker: document.querySelector("#powerMarker"), powerNumber: document.querySelector("#powerNumber"),
+  aimUp: document.querySelector("#aimUpBtn"), aimDown: document.querySelector("#aimDownBtn"), angleValue: document.querySelector("#angleValue"),
   sound: document.querySelector("#soundBtn"), fullscreen: document.querySelector("#fullscreenBtn")
 };
 
@@ -17,8 +18,8 @@ const player = { x: 265, y: floorY, vx: 0, width: 148, height: 232, frame: 0, an
 const ball = { x: 0, y: 0, vx: 0, vy: 0, radius: 23, active: false, scored: false, bounced: false, age: 0 };
 const state = {
   started: false, ended: false, mode: "challenge", score: 0, shots: 10, streak: 0,
-  charging: false, power: 0, chargeDirection: 1, canShoot: true, sound: true,
-  keys: { left: false, right: false }, lastTime: performance.now(), messageTimer: 0,
+  charging: false, power: 0, chargeDirection: 1, angle: 55, canShoot: true, sound: true,
+  keys: { left: false, right: false, up: false, down: false }, lastTime: performance.now(), messageTimer: 0,
   targetX: null, previousTargetX: null
 };
 
@@ -39,7 +40,7 @@ function loadImages() {
 
 function startGame(mode = state.mode) {
   state.mode = mode; state.started = true; state.ended = false; state.score = 0; state.shots = mode === "practice" ? Infinity : 10;
-  state.streak = 0; state.charging = false; state.power = 0; state.canShoot = true;
+  state.streak = 0; state.charging = false; state.power = 0; state.angle = 55; state.canShoot = true;
   player.x = 265; player.frame = 0; ball.active = false; state.targetX = null; state.previousTargetX = null;
   if (mode === "target") chooseNextTarget(true);
   ui.start.classList.add("hidden"); ui.end.classList.add("hidden");
@@ -97,12 +98,9 @@ function shootBall(power) {
   const startX = player.x + 80, startY = player.y - 190;
   const dx = hoop.rimLeft + 40 - startX;
   const dy = hoop.rimY - 8 - startY;
-  const angle = 55 * Math.PI / 180;
-  const gravity = 960;
-  const denominator = 2 * Math.cos(angle) ** 2 * (dx * Math.tan(angle) + dy);
-  const idealSpeed = Math.sqrt(Math.max(1, gravity * dx * dx / denominator));
-  const accuracy = Math.max(.55, Math.min(1.38, power / 71));
-  ball.x = startX; ball.y = startY; ball.vx = idealSpeed * Math.cos(angle) * accuracy; ball.vy = -idealSpeed * Math.sin(angle) * accuracy;
+  const angle = state.angle * Math.PI / 180;
+  const speed = 430 + power * 8.7;
+  ball.x = startX; ball.y = startY; ball.vx = speed * Math.cos(angle); ball.vy = -speed * Math.sin(angle);
   ball.active = true; ball.scored = false; ball.bounced = false; ball.age = 0;
   sound("shoot"); updateHud();
 }
@@ -171,6 +169,8 @@ function update(dt) {
     player.x = Math.max(105, Math.min(780, player.x));
     if (moving) { player.anim += dt * 9; player.frame = 1 + (Math.floor(player.anim) % 2); }
     else if (state.canShoot && player.frame !== 7) player.frame = 0;
+    const aimDirection = (state.keys.up ? 1 : 0) - (state.keys.down ? 1 : 0);
+    state.angle = Math.max(35, Math.min(75, state.angle + aimDirection * 38 * dt));
   }
 
   if (state.charging) {
@@ -179,6 +179,7 @@ function update(dt) {
     if (state.power <= 8) { state.power = 8; state.chargeDirection = 1; }
   }
   ui.fill.style.width = `${state.power}%`; ui.marker.style.left = `${state.power}%`; ui.powerNumber.textContent = `${Math.round(state.power)}%`;
+  ui.angleValue.textContent = `${Math.round(state.angle)}°`;
 
   if (ball.active) {
     const oldY = ball.y; ball.age += dt; ball.vy += 960 * dt; ball.x += ball.vx * dt; ball.y += ball.vy * dt;
@@ -232,6 +233,21 @@ function draw() {
   }
 
   if (images.hoop) ctx.drawImage(images.hoop, 955, 180, 300, 252);
+  if (state.started && !ball.active) {
+    const guideX = player.x + 80, guideY = player.y - 190;
+    const radians = state.angle * Math.PI / 180;
+    const endX = guideX + Math.cos(radians) * 190;
+    const endY = guideY - Math.sin(radians) * 190;
+    ctx.save();
+    ctx.lineCap = "round"; ctx.setLineDash([13, 11]);
+    ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.moveTo(guideX, guideY); ctx.lineTo(endX, endY); ctx.stroke();
+    ctx.strokeStyle = "#f36b21"; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(guideX, guideY); ctx.lineTo(endX, endY); ctx.stroke();
+    ctx.setLineDash([]); ctx.fillStyle = "#10233f"; ctx.font = "900 20px system-ui"; ctx.textAlign = "center";
+    ctx.fillText(`${Math.round(state.angle)}°`, endX, endY - 13);
+    ctx.restore();
+  }
   if (ball.active && images.ball) {
     ctx.save(); ctx.translate(ball.x, ball.y); ctx.rotate(ball.age * 8); ctx.drawImage(images.ball, -ball.radius, -ball.radius, ball.radius * 2, ball.radius * 2); ctx.restore();
   }
@@ -250,6 +266,18 @@ function setMove(direction, pressed) {
   state.keys[direction] = pressed; ui[direction].classList.toggle("pressed", pressed);
 }
 
+function setAim(direction, pressed, nudge = false) {
+  if (!pressed) {
+    state.keys[direction] = false;
+    ui[direction === "up" ? "aimUp" : "aimDown"].classList.remove("pressed");
+    return;
+  }
+  if (!state.started || ball.active || state.charging) return;
+  state.keys[direction] = pressed;
+  ui[direction === "up" ? "aimUp" : "aimDown"].classList.toggle("pressed", pressed);
+  if (pressed && nudge) state.angle = Math.max(35, Math.min(75, state.angle + (direction === "up" ? 2 : -2)));
+}
+
 function holdButton(button, onDown, onUp) {
   button.addEventListener("pointerdown", e => { e.preventDefault(); button.setPointerCapture?.(e.pointerId); onDown(); });
   button.addEventListener("pointerup", e => { e.preventDefault(); onUp(); });
@@ -258,18 +286,24 @@ function holdButton(button, onDown, onUp) {
 
 holdButton(ui.left, () => setMove("left", true), () => setMove("left", false));
 holdButton(ui.right, () => setMove("right", true), () => setMove("right", false));
+holdButton(ui.aimUp, () => setAim("up", true, true), () => setAim("up", false));
+holdButton(ui.aimDown, () => setAim("down", true, true), () => setAim("down", false));
 holdButton(ui.shoot, beginCharge, releaseShot);
 
 window.addEventListener("keydown", e => {
-  if (["ArrowLeft","ArrowRight","Space","Enter","KeyA","KeyD"].includes(e.code)) e.preventDefault();
+  if (["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Space","Enter","KeyA","KeyD","KeyW","KeyS"].includes(e.code)) e.preventDefault();
   if (e.repeat && ["Space","Enter"].includes(e.code)) return;
   if (e.code === "ArrowLeft" || e.code === "KeyA") setMove("left", true);
   if (e.code === "ArrowRight" || e.code === "KeyD") setMove("right", true);
+  if ((e.code === "ArrowUp" || e.code === "KeyW") && !state.keys.up) setAim("up", true, true);
+  if ((e.code === "ArrowDown" || e.code === "KeyS") && !state.keys.down) setAim("down", true, true);
   if (e.code === "Space" || e.code === "Enter") beginCharge();
 });
 window.addEventListener("keyup", e => {
   if (e.code === "ArrowLeft" || e.code === "KeyA") setMove("left", false);
   if (e.code === "ArrowRight" || e.code === "KeyD") setMove("right", false);
+  if (e.code === "ArrowUp" || e.code === "KeyW") setAim("up", false);
+  if (e.code === "ArrowDown" || e.code === "KeyS") setAim("down", false);
   if (e.code === "Space" || e.code === "Enter") releaseShot();
 });
 
@@ -287,7 +321,7 @@ ui.fullscreen.addEventListener("click", async () => {
   try { if (!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen(); } catch (_) { showMessage("Fullscreen er ekki í boði", false); }
 });
 
-window.addEventListener("blur", () => { setMove("left", false); setMove("right", false); if (state.charging) releaseShot(); });
+window.addEventListener("blur", () => { setMove("left", false); setMove("right", false); setAim("up", false); setAim("down", false); if (state.charging) releaseShot(); });
 window.addEventListener("contextmenu", e => e.preventDefault());
 ui.highScore.textContent = localStorage.getItem("basketballHighScore") || "0";
 loadImages().then(draw); requestAnimationFrame(frame);

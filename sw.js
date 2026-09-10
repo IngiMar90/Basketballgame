@@ -1,4 +1,4 @@
-const CACHE = "korfubolti-v1";
+const CACHE = "korfubolti-v2";
 const FILES = [
   "./", "./index.html", "./styles.css", "./game.js", "./manifest.webmanifest",
   "./assets/gym.webp", "./assets/hoop-game.webp", "./assets/ball-game.webp",
